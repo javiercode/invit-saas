@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirigiendo...</title>
+    <script type="text/javascript">
+      // Segmento SPA GitHub Pages Redirect
+      // Permite que rutas profundas (ej: /invitacion/boda-juan-y-maria) sean gestionadas por React Router
+      var pathSegmentsToKeep = 1; // Ajustar a 1 si el repositorio es proyect-name (usuario.github.io/repo/), o 0 si es dominio raíz
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

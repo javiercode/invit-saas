@@ -1,0 +1,178 @@
+.gift-table-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  padding: 1.75rem 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  margin: 1.5rem 0;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.gift-header {
+  margin-bottom: 1.25rem;
+}
+
+.gift-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+  background: rgba(212, 175, 55, 0.15);
+  color: #b38728;
+}
+
+.gift-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.gift-message {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.gift-stores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.store-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background: #fdfbf7;
+  border: 1px solid #ebd9b8;
+  border-radius: 12px;
+}
+
+.store-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.store-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c2c2c;
+}
+
+.store-event-num {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.store-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #b38728;
+  color: #ffffff;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.store-link-btn:hover {
+  background: #966f1e;
+}
+
+.bank-details-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  border: 1px solid #eee;
+  text-align: left;
+}
+
+.bank-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 0.5rem;
+}
+
+.bank-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.bank-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bank-label {
+  color: #777;
+}
+
+.bank-val {
+  font-weight: 500;
+  color: #222;
+}
+
+.bank-clabe-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
+  margin-top: 0.5rem;
+}
+
+.clabe-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.clabe-number {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111;
+  letter-spacing: 0.05em;
+}
+
+.copy-btn {
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background: #e2e2e2;
+}
+
+.text-copied {
+  color: #27ae60;
+}

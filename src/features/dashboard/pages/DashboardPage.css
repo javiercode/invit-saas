@@ -1,0 +1,199 @@
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #b38728;
+}
+
+.dashboard-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  margin: 0.25rem 0;
+  color: #1a1a1a;
+}
+
+.dashboard-header p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.btn-create-invitation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-create-invitation:hover {
+  background: #333333;
+}
+
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #ebd9b8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #777;
+}
+
+.stat-num {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #b38728;
+}
+
+.dashboard-list-section h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #222;
+}
+
+.invitations-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.invitation-admin-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.inv-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.inv-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem;
+}
+
+.inv-template-tag {
+  font-size: 0.75rem;
+  color: #b38728;
+  font-weight: 600;
+}
+
+.inv-status-pill {
+  background: #e6f4ea;
+  color: #137333;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.inv-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.detail-icon {
+  color: #888;
+}
+
+.inv-admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+}
+
+.btn-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: #ffffff;
+  color: #444;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  background: #f8f8f8;
+  border-color: #bbb;
+}
+
+.btn-view {
+  background: #fdfbf7;
+  color: #b38728;
+  border-color: #ebd9b8;
+}
+
+.btn-view:hover {
+  background: #f7eee0;
+}
+
+.text-green {
+  color: #10b981;
+}

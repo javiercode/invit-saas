@@ -1,0 +1,119 @@
+.template-renderer-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background-color: #fafafa;
+}
+
+/* Modo vista previa (Builder) */
+.preview-top-banner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  color: #f8fafc;
+  z-index: 9000;
+  padding: 0.6rem 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.preview-banner-content {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.preview-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.preview-info strong {
+  color: #60a5fa;
+}
+
+/* Loading State */
+.renderer-loading-state,
+.renderer-error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: #f8fafc;
+}
+
+.loading-card,
+.error-card {
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  max-width: 440px;
+  width: 100%;
+}
+
+.spinner-icon {
+  color: #b38728;
+  animation: spin 1.2s linear infinite;
+  margin-bottom: 1.25rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-card h2,
+.error-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.loading-card p,
+.error-card p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.error-actions {
+  margin-top: 1.5rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background: #334155;
+  transform: translateY(-2px);
+}

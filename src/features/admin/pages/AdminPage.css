@@ -1,0 +1,3 @@
+.admin-container { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+.admin-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+.admin-table th, .admin-table td { text-align: left; padding: 10px; border-bottom: 1px solid #e5e5e5; }

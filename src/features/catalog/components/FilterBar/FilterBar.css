@@ -1,0 +1,88 @@
+.filter-bar-container {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-pills-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-pill {
+  white-space: nowrap;
+  background: #ffffff;
+  border: 1.5px solid #e5e5e5;
+  color: #4a4a4a;
+  padding: 0.55rem 1.15rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.filter-pill:hover {
+  border-color: #b38728;
+  color: #b38728;
+}
+
+.filter-pill.active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.filter-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #ebebeb;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-icon {
+  color: #888;
+}
+
+.control-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.filter-select {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  color: #333;
+  background-color: #fafafa;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  border-color: #b38728;
+}
