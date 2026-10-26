@@ -8,8 +8,11 @@ export default defineConfig({
     port: 3000,
     open: true
   },
-  optimizeDeps: {
-    exclude: ['fsevents'],
-    force: true
+  build: {
+    rollupOptions: {
+      // Ignora fsevents (módulo exclusivo de macOS) en el build de producción.
+      // Es seguro porque tu app es un SPA y no lo usa en el navegador.
+      external: ['fsevents']
+    }
   }
 });
