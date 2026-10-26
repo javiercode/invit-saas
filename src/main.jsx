@@ -1,11 +1,10 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
 
-export default defineConfig({
-  plugins: [react()],
-  base: process.env.VITE_BASE_PATH || '/',
-  server: {
-    port: 3000,
-    open: true
-  }
-});
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
