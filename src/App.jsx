@@ -24,7 +24,7 @@ export function App() {
           <Navbar />
           <div className="app-main-content">
             <Routes>
-              <Route path="/" element={<Navigate to="/catalogo" replace />} />
+              <Route path="/" element={<CatalogPage />} />
               <Route path="/catalogo" element={<CatalogPage />} />
               <Route path="/invitacion/:slug" element={<InvitationViewerPage />} />
               <Route path="/builder" element={<RequireAuth><BuilderPage /></RequireAuth>} />
@@ -32,7 +32,7 @@ export function App() {
               <Route path="/admin" element={<RequireAuth adminOnly><AdminPage /></RequireAuth>} />
               <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="*" element={<Navigate to="/catalogo" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
           <Footer />
