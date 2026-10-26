@@ -1,12 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { builtinModules } from 'module';
-
-const allExternal = [
-  ...builtinModules,
-  ...builtinModules.map((m) => `node:${m}`),
-  'fsevents'
-];
 
 export default defineConfig({
   plugins: [react()],
@@ -15,9 +8,8 @@ export default defineConfig({
     port: 3000,
     open: true
   },
-  build: {
-    rollupOptions: {
-      external: allExternal
-    }
+  optimizeDeps: {
+    exclude: ['fsevents'],
+    force: true
   }
 });
