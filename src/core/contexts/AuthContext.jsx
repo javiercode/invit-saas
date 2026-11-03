@@ -4,6 +4,7 @@ import {
   isFirebaseConfigured, 
   googleAuthProvider 
 } from '../firebase';
+import { getDemoUser } from '../demoUser';
 import { usersService } from '../services/usersService';
 import { 
   onAuthStateChanged, 
@@ -31,13 +32,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
-      // Mock user en modo de prueba local
-      setUser({
-        uid: 'demo-user-123',
-        displayName: 'Usuario Demo',
-        email: 'demo@invitaciones.com',
-        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-      });
+      // Usuario simulado solo en desarrollo local (en producción: sin sesión)
+      setUser(getDemoUser(isFirebaseConfigured, import.meta.env.DEV));
       setLoading(false);
       return;
     }

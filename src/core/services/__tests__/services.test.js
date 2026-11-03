@@ -114,3 +114,12 @@ describe('storageService (Supabase Storage)', () => {
     expect(res.storageType).toBe('local-data-url');
   });
 });
+
+describe('sesión simulada', () => {
+  it('solo existe en desarrollo sin Firebase; en producción no hay sesión', async () => {
+    const { getDemoUser } = await import('../../demoUser');
+    expect(getDemoUser(false, true)?.uid).toBe('demo-user-123');
+    expect(getDemoUser(false, false)).toBeNull();
+    expect(getDemoUser(true, true)).toBeNull();
+  });
+});
