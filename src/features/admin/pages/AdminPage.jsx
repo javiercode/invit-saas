@@ -7,6 +7,7 @@ import './AdminPage.css';
 export const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [invitations, setInvitations] = useState([]);
+  const [newUser, setNewUser] = useState({ email: '', role: 'user' });
 
   const load = async () => {
     setUsers(await usersService.list());
@@ -15,6 +16,13 @@ export const AdminPage = () => {
   useEffect(() => { load(); }, []);
 
   const patchUser = async (uid, patch) => { await usersService.update(uid, patch); load(); };
+  const addUser = async (e) => {
+    e.preventDefault();
+    await usersService.create(newUser);
+    setNewUser({ email: '', role: 'user' });
+    load();
+  };
+  const removeUser = async (uid) => { if (window.confirm('¿Eliminar este usuario?')) { await usersService.remove(uid); load(); } };
   const patchInv = async (id, patch) => { await invitationsService.update(id, patch); load(); };
 
   return (
@@ -22,21 +30,30 @@ export const AdminPage = () => {
       <h1>Administración</h1>
 
       <h2>Usuarios</h2>
+      <form onSubmit={addUser} className="admin-user-form">
+        <input type="email" required placeholder="correo@ejemplo.com" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
+        <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
+          <option value="user">USER</option>
+          <option value="admin">ADMIN</option>
+        </select>
+        <button type="submit">Agregar</button>
+      </form>
       <table className="admin-table">
-        <thead><tr><th>Usuario</th><th>Rol</th><th>Habilitado</th></tr></thead>
+        <thead><tr><th>Usuario</th><th>Rol</th><th>Habilitado</th><th></th></tr></thead>
         <tbody>
           {users.map((u) => (
             <tr key={u.uid}>
               <td>{u.displayName || u.email}<br /><small>{u.email}</small></td>
               <td>
                 <select value={u.role} onChange={(e) => patchUser(u.uid, { role: e.target.value })}>
-                  <option value="cliente">Cliente</option>
-                  <option value="admin">Administrador</option>
+                  <option value="user">USER</option>
+                  <option value="admin">ADMIN</option>
                 </select>
               </td>
               <td>
                 <input type="checkbox" checked={Boolean(u.enabled)} onChange={(e) => patchUser(u.uid, { enabled: e.target.checked })} />
               </td>
+              <td><button type="button" onClick={() => removeUser(u.uid)}>Eliminar</button></td>
             </tr>
           ))}
         </tbody>

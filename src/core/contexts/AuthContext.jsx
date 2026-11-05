@@ -10,7 +10,6 @@ import {
   onAuthStateChanged, 
   signInWithPopup, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
   signOut 
 } from 'firebase/auth';
 
@@ -26,7 +25,8 @@ export const AuthProvider = ({ children }) => {
     if (!user) { setProfile(null); return; }
     usersService.ensureProfile(user).then(setProfile).catch((e) => {
       console.error('Error al cargar el perfil:', e);
-      setProfile(null);
+      setProfile({ role: 'user', enabled: false }); // evita quedarse cargando
+
     });
   }, [user]);
 
@@ -46,19 +46,22 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // Sin Firebase: en dev usa la sesión demo; en producción falla con un error claro
+  const requireConfigured = () => {
+    if (isFirebaseConfigured || import.meta.env.DEV) return;
+    throw Object.assign(new Error('Firebase no configurado'), { code: 'auth/not-configured' });
+  };
+
   const loginWithGoogle = async () => {
+    requireConfigured();
     if (!isFirebaseConfigured) return user;
     return signInWithPopup(auth, googleAuthProvider);
   };
 
   const loginWithEmail = async (email, password) => {
+    requireConfigured();
     if (!isFirebaseConfigured) return user;
     return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const registerWithEmail = async (email, password) => {
-    if (!isFirebaseConfigured) return user;
-    return createUserWithEmailAndPassword(auth, email, password);
   };
 
   const logout = async () => {
@@ -70,7 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, isAdmin: profile?.role === 'admin', isEnabled: Boolean(profile?.enabled), loading, loginWithGoogle, loginWithEmail, registerWithEmail, logout }}>
+    <AuthContext.Provider value={{ user, profile, isAdmin: profile?.role === 'admin', isEnabled: profile?.enabled !== false, loading, loginWithGoogle, loginWithEmail, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../core/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { authErrorMessage } from '../../../core/authErrors';
 import { LogIn, Sparkles } from 'lucide-react';
 import './LoginPage.css';
 
 export const LoginPage = () => {
-  const { loginWithGoogle, loginWithEmail, registerWithEmail } = useAuth();
+  const { loginWithGoogle, loginWithEmail } = useAuth();
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -16,14 +16,10 @@ export const LoginPage = () => {
     e.preventDefault();
     setError(null);
     try {
-      if (isRegister) {
-        await registerWithEmail(email, password);
-      } else {
-        await loginWithEmail(email, password);
-      }
+      await loginWithEmail(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Error en la autenticación.');
+      setError(authErrorMessage(err));
     }
   };
 
@@ -32,7 +28,7 @@ export const LoginPage = () => {
       await loginWithGoogle();
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Error con Google Auth.');
+      setError(authErrorMessage(err));
     }
   };
 
@@ -44,12 +40,8 @@ export const LoginPage = () => {
             <Sparkles size={14} />
             <span>Acceso Clientes</span>
           </span>
-          <h2>{isRegister ? 'Crear Cuenta' : 'Bienvenido de Nuevo'}</h2>
-          <p>
-            {isRegister
-              ? 'Empieza a diseñar tus invitaciones de forma sencilla.'
-              : 'Ingresa para administrar tus eventos y respuestas RSVP.'}
-          </p>
+          <h2>Bienvenido de Nuevo</h2>
+          <p>Ingresa para administrar tus eventos y respuestas RSVP.</p>
         </div>
 
         {error && <div className="login-error-banner">{error}</div>}
@@ -105,27 +97,9 @@ export const LoginPage = () => {
 
           <button type="submit" className="btn-submit-auth">
             <LogIn size={18} />
-            <span>{isRegister ? 'Crear Cuenta' : 'Iniciar Sesión'}</span>
+            <span>Iniciar Sesión</span>
           </button>
         </form>
-
-        <div className="toggle-auth-mode">
-          {isRegister ? (
-            <p>
-              ¿Ya tienes cuenta?{' '}
-              <button type="button" onClick={() => setIsRegister(false)}>
-                Inicia sesión aquí
-              </button>
-            </p>
-          ) : (
-            <p>
-              ¿No tienes cuenta aún?{' '}
-              <button type="button" onClick={() => setIsRegister(true)}>
-                Regístrate gratis
-              </button>
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );

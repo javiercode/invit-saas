@@ -100,6 +100,11 @@ const VARIANTS = {
     images: ['photo-1517457373958-b7bdd4587205', 'photo-1583939003579-730e3918a45a', 'photo-1469371670807-013ccf25f16a'],
     names: ['Cuento de Hadas', 'Mascarada Veneciana', 'Rosa Gold', 'Noche de Estrellas', 'Quinceañera Tropical', 'Vestido Azul Real', 'Mariposas', 'Paris Chic', 'Neón Party', 'Vintage Glam']
   },
+  cumpleanos: {
+    label: 'Cumpleaños', price: 25,
+    images: ['photo-1530103862676-de8c9debad1d', 'photo-1464349153735-7db50ed83c84', 'photo-1527529482837-4698179dc6ce'],
+    names: ['Fiesta Confeti', 'Cumple Neón', 'Piñata Mexicana', 'Superhéroes', 'Unicornio Mágico', 'Safari Salvaje', 'Fiesta Tropical', 'Medio Siglo', 'Cumpleaños Elegante', 'Noche Retro', 'Pool Party']
+  },
   bautizos: {
     label: 'Bautizo', price: 28,
     images: ['photo-1515934751635-c81c6bc9a2d8', 'photo-1511285560929-80b456fea0bc', 'photo-1469371670807-013ccf25f16a'],
@@ -142,6 +147,7 @@ export const MOCK_INVITATIONS = {
     confirmedGuests: 84,
     totalPases: 120,
     enabled: true,
+    sections: { ceremony: true, reception: true, itinerary: true, dressCode: true, gallery: true },
     templateId: 'elegante',
     couple: {
       bride: 'Juliana',
@@ -231,6 +237,7 @@ export const MOCK_INVITATIONS = {
     confirmedGuests: 62,
     totalPases: 90,
     enabled: true,
+    sections: { ceremony: true, reception: true, itinerary: true, dressCode: true, gallery: true },
     templateId: 'vintage',
     couple: {
       bride: 'María',

@@ -9,6 +9,7 @@ import {
   setDoc, 
   addDoc, 
   updateDoc, 
+  deleteDoc, 
   query, 
   where, 
   orderBy, 
@@ -67,6 +68,7 @@ export const servicesRef = collection(db, COLLECTIONS.SERVICES);
 export const invitationsRef = collection(db, COLLECTIONS.INVITATIONS);
 
 export {
+  deleteDoc,
   collection,
   doc,
   getDoc,

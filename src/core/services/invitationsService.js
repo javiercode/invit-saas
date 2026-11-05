@@ -71,6 +71,7 @@ export const invitationsService = {
   async save(invitation) {
     const id = invitation.slug || invitation.id;
     const data = { ...invitation, id, slug: id };
+    if (data.ownerId) data.userId = data.ownerId; // las reglas de Firestore validan userId
     if (isFirebaseConfigured) {
       await setDoc(doc(db, COLLECTIONS.INVITATIONS, id), data, { merge: true });
     } else {

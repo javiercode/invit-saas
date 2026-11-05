@@ -53,7 +53,7 @@ export const CardCatalogo = ({ service }) => {
         <p className="card-desc">{description}</p>
 
         <div className="card-actions">
-          <Link to={`/simulador?template=${templateId}`} className="card-btn-customize">
+          <Link to={`/simulador?template=${templateId}&service=${id}`} className="card-btn-customize">
             <Sparkles size={16} />
             <span>Personalizar</span>
           </Link>

@@ -13,6 +13,7 @@ export const FilterBar = ({
   const eventTypes = [
     { id: 'all', label: 'Todos los Eventos' },
     { id: 'bodas', label: 'Bodas' },
+    { id: 'cumpleanos', label: 'Cumpleaños' },
     { id: 'xv_anos', label: 'XV Años' },
     { id: 'bautizos', label: 'Bautizos' },
     { id: 'graduaciones', label: 'Graduaciones' }

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TemplateRenderer from '../TemplateRenderer';
 import ImageUploader from '../components/ImageUploader';
-import { TEMPLATES_REGISTRY } from '../../../templates';
 import { MOCK_INVITATIONS } from '../../../core/services/mockData';
+import { TemplatePickerModal, PlaceModal, ItineraryModal, DressCodeModal, PhotosModal } from '../components/EditorModals/EditorModals';
+import { SECTIONS, EVENT_TYPES } from '../../../core/sections';
 import { invitationsService } from '../../../core/services/invitationsService';
 import { useAuth } from '../../../core/contexts/AuthContext';
 import { Smartphone, Monitor, Save, Sparkles, Link as LinkIcon } from 'lucide-react';
@@ -20,8 +21,14 @@ export const BuilderPage = ({ simulator = false }) => {
   const { profile } = useAuth();
   const [myInvitations, setMyInvitations] = useState([]);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [modal, setModal] = useState(null); // 'templates' | clave de sección
+  const [catalog, setCatalog] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTemplate = searchParams.get('template') || 'elegante';
+  const urlTemplate = searchParams.get('template');
+  const urlService = searchParams.get('service');
+  const initialTemplate = urlTemplate || 'elegante';
+  const [eventFilter, setEventFilter] = useState('all');
 
   const [selectedTemplate, setSelectedTemplate] = useState(initialTemplate);
   const [previewDevice, setPreviewDevice] = useState('mobile'); // 'mobile' | 'desktop'
@@ -29,8 +36,17 @@ export const BuilderPage = ({ simulator = false }) => {
   // Datos base clonados del mock
   const [formData, setFormData] = useState({
     ...MOCK_INVITATIONS['j-m-2024'],
-    templateId: selectedTemplate
+    templateId: selectedTemplate,
+    ...(urlService && { serviceId: urlService })
   });
+
+  useEffect(() => {
+    invitationsService.getCatalogServices().then((list) => {
+      setCatalog(list);
+      const s = list.find((x) => x.id === urlService);
+      if (s) setEventFilter(s.eventType);
+    });
+  }, []);
 
   // Editor (con sesión): carga las invitaciones habilitadas para el usuario
   useEffect(() => {
@@ -42,24 +58,44 @@ export const BuilderPage = ({ simulator = false }) => {
   }, [simulator, profile]);
 
   const selectInvitation = (inv) => {
-    setFormData(inv);
-    setSelectedTemplate(inv.templateId || 'elegante');
+    // Una plantilla elegida desde el catálogo (?template=) tiene prioridad sobre la guardada
+    const merged = urlTemplate ? { ...inv, templateId: urlTemplate, ...(urlService && { serviceId: urlService }) } : inv;
+    setFormData(merged);
+    setSelectedTemplate(merged.templateId || 'elegante');
     setSaved(false);
   };
 
   const handleSave = async () => {
-    await invitationsService.save(formData);
-    setSaved(true);
+    setSaveError(null);
+    try {
+      await invitationsService.save({ ...formData, ownerId: formData.ownerId || profile?.uid });
+      setSaved(true);
+    } catch (e) {
+      setSaveError(e.code === 'permission-denied'
+        ? 'Sin permisos en Firestore: publica las reglas de firestore.rules y verifica que la invitación esté asignada a tu usuario.'
+        : e.message);
+    }
   };
 
   const publishUrl = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/invitacion/${
     simulator ? DEFAULT_PUBLISH_SLUG : formData.slug
   }`;
 
-  const handleTemplateChange = (tplId) => {
+  const handleTemplateChange = (tplId, serviceId) => {
     setSelectedTemplate(tplId);
-    setFormData((prev) => ({ ...prev, templateId: tplId }));
-    setSearchParams({ template: tplId });
+    setFormData((prev) => ({ ...prev, templateId: tplId, serviceId }));
+    setSearchParams({ template: tplId, ...(serviceId && { service: serviceId }) });
+  };
+  const filteredCatalog = catalog.filter((s) => eventFilter === 'all' || s.eventType === eventFilter);
+
+  const toggleSection = (key, on) => setFormData((p) => ({ ...p, sections: { ...p.sections, [key]: on } }));
+  const patchLocation = (key) => (val) => setFormData((p) => ({ ...p, locations: { ...p.locations, [key]: val } }));
+  const sectionModal = {
+    ceremony: () => <PlaceModal title="Ceremonia Religiosa" value={formData.locations?.ceremony} onSave={patchLocation('ceremony')} onClose={() => setModal(null)} />,
+    reception: () => <PlaceModal title="Recepción & Fiesta" value={formData.locations?.reception} onSave={patchLocation('reception')} onClose={() => setModal(null)} />,
+    itinerary: () => <ItineraryModal value={formData.itinerary} onSave={(v) => setFormData((p) => ({ ...p, itinerary: v }))} onClose={() => setModal(null)} />,
+    dressCode: () => <DressCodeModal value={formData.dressCode} onSave={(v) => setFormData((p) => ({ ...p, dressCode: v }))} onClose={() => setModal(null)} />,
+    gallery: () => <PhotosModal value={formData.gallery} temporary={simulator} onSave={(v) => setFormData((p) => ({ ...p, gallery: v }))} onClose={() => setModal(null)} />
   };
 
   const handleCoupleChange = (field, val) => {
@@ -95,6 +131,9 @@ export const BuilderPage = ({ simulator = false }) => {
       {/* Panel lateral de controles del Builder */}
       <aside className="builder-sidebar">
         <div className="builder-sidebar-header">
+          <select className="filter-select" value={eventFilter} onChange={(e) => setEventFilter(e.target.value)} title="Tipo de plantilla">
+            {EVENT_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
           {!simulator && (
             <select
               className="filter-select"
@@ -121,18 +160,32 @@ export const BuilderPage = ({ simulator = false }) => {
         <div className="builder-section">
           <label className="builder-label">Elige la Plantilla Dinámica</label>
           <div className="templates-selector-grid">
-            {Object.values(TEMPLATES_REGISTRY).map((tpl) => (
+            {filteredCatalog.slice(0, 3).map((tpl) => (
               <button
                 key={tpl.id}
                 type="button"
-                className={`template-select-card ${selectedTemplate === tpl.id ? 'active' : ''}`}
-                onClick={() => handleTemplateChange(tpl.id)}
+                className={`template-select-card ${formData.serviceId === tpl.id ? 'active' : ''}`}
+                onClick={() => handleTemplateChange(tpl.templateId, tpl.id)}
               >
-                <img src={tpl.previewImage} alt={tpl.name} />
-                <span className="template-card-name">{tpl.name}</span>
+                <img src={tpl.image} alt={tpl.title} />
+                <span className="template-card-name">{tpl.title}</span>
               </button>
             ))}
           </div>
+          <button type="button" className="em-more" onClick={() => setModal('templates')}>Ver más</button>
+        </div>
+
+        <div className="builder-section">
+          <label className="builder-label">Secciones (opcionales)</label>
+          {SECTIONS.map((s) => (
+            <div key={s.key} className="em-section-row">
+              <label>
+                <input type="checkbox" checked={formData.sections?.[s.key] === true} onChange={(e) => toggleSection(s.key, e.target.checked)} />
+                {s.label}
+              </label>
+              <button type="button" onClick={() => setModal(s.key)}>Registrar / editar</button>
+            </div>
+          ))}
         </div>
 
         <div className="builder-section">
@@ -205,8 +258,9 @@ export const BuilderPage = ({ simulator = false }) => {
               <span>{saved ? '¡Guardado!' : 'Guardar'}</span>
             </button>
           )}
-          <p className="field-label">
-            <LinkIcon size={12} /> Publicada en: <a href={publishUrl} target="_blank" rel="noreferrer">{publishUrl}</a>
+          {saveError && <p className="save-error">{saveError}</p>}
+          <p className="publish-url">
+            <LinkIcon size={14} /> Publicada en: <a href={publishUrl} target="_blank" rel="noreferrer">{publishUrl}</a>
           </p>
         </div>
       </aside>
@@ -246,6 +300,15 @@ export const BuilderPage = ({ simulator = false }) => {
           </div>
         </div>
       </section>
+      {modal === 'templates' && (
+        <TemplatePickerModal
+          services={filteredCatalog}
+          selectedId={formData.serviceId}
+          onSelect={(s) => handleTemplateChange(s.templateId, s.id)}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {sectionModal[modal]?.()}
     </div>
   );
 };

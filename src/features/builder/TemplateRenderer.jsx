@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { TEMPLATES_REGISTRY, getTemplateById } from '../../templates';
 import { invitationsService } from '../../core/services/invitationsService';
+import { applySections } from '../../core/sections';
 import { Loader2, AlertCircle, ArrowLeft, Eye } from 'lucide-react';
 import './TemplateRenderer.css';
 
@@ -112,7 +113,7 @@ export const TemplateRenderer = ({
       )}
 
       {/* Renderizado de la plantilla HTML/React responsiva con los datos inyectados */}
-      <SelectedTemplateComponent data={invitationData} />
+      <SelectedTemplateComponent data={applySections(invitationData)} />
     </div>
   );
 };

@@ -1,0 +1,24 @@
+.em-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 1rem; }
+.em-modal { position: relative; background: #fff; border-radius: 16px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; }
+.em-modal h3 { margin: 0 0 1rem; }
+.em-close { position: absolute; top: .8rem; right: .8rem; background: none; border: none; cursor: pointer; color: #888; }
+.em-form { display: flex; flex-direction: column; gap: .75rem; }
+.em-field { display: flex; flex-direction: column; gap: .25rem; font-size: .8rem; font-weight: 600; color: #64748b; }
+.em-form input, .em-form textarea, .em-form select { padding: .5rem; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+.em-row { display: flex; gap: .5rem; align-items: center; }
+.em-row input:last-of-type { flex: 1; }
+.em-row button { background: none; border: none; cursor: pointer; color: #b91c1c; }
+.em-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+.em-primary { background: #b38728; color: #fff; border: none; border-radius: 8px; padding: .65rem; font-weight: 700; cursor: pointer; }
+.em-secondary { background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 8px; padding: .5rem; cursor: pointer; }
+.em-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .6rem; }
+.em-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: .3rem; cursor: pointer; font-size: .72rem; font-weight: 600; display: flex; flex-direction: column; gap: .3rem; }
+.em-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 6px; }
+.em-card.active { border-color: #b38728; box-shadow: 0 0 0 2px rgba(179,135,40,.2); }
+.em-section-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .4rem 0; font-size: .85rem; }
+.em-section-row label { display: flex; align-items: center; gap: .4rem; }
+.em-section-row button, .em-more { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: .3rem .7rem; cursor: pointer; font-size: .78rem; }
+.em-more { width: 100%; margin-top: .5rem; }
+.publish-url { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; background: #fffbeb; border: 1px solid #b38728; border-left: 4px solid #b38728; border-radius: 8px; padding: .6rem .75rem; font-size: .8rem; font-weight: 700; color: #7a5a14; }
+.publish-url a { color: #b38728; word-break: break-all; text-decoration: underline; }
+.save-error { color: #b91c1c; font-size: .8rem; font-weight: 600; }

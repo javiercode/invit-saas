@@ -10,7 +10,7 @@ export const RequireAuth = ({ children, adminOnly = false }) => {
   if (loading || (user && !profile)) return <p style={{ padding: 40, textAlign: 'center' }}>Cargando sesión...</p>;
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   if (!isEnabled) {
-    return <p style={{ padding: 40, textAlign: 'center' }}>Tu cuenta aún no ha sido habilitada por un administrador.</p>;
+    return <p style={{ padding: 40, textAlign: 'center' }}>Tu cuenta está deshabilitada. Contacta a un administrador.</p>;
   }
   if (adminOnly && !isAdmin) return <Navigate to="/dashboard" replace />;
   return children;

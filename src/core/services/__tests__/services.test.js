@@ -7,6 +7,7 @@ const fb = vi.hoisted(() => ({
   getDocs: vi.fn(),
   setDoc: vi.fn(),
   updateDoc: vi.fn(),
+  deleteDoc: vi.fn(),
   signIn: vi.fn()
 }));
 
@@ -22,6 +23,7 @@ vi.mock('../../firebase', () => ({
   getDocs: fb.getDocs,
   setDoc: fb.setDoc,
   updateDoc: fb.updateDoc,
+  deleteDoc: fb.deleteDoc,
   addDoc: vi.fn(),
   serverTimestamp: vi.fn(),
   arrayUnion: vi.fn()
@@ -46,7 +48,7 @@ beforeEach(() => {
 
 describe('catálogo', () => {
   it('tiene al menos 10 opciones adicionales por sección', () => {
-    for (const type of ['bodas', 'xv_anos', 'bautizos', 'graduaciones']) {
+    for (const type of ['bodas', 'cumpleanos', 'xv_anos', 'bautizos', 'graduaciones']) {
       expect(MOCK_SERVICES.filter((s) => s.eventType === type).length).toBeGreaterThanOrEqual(11);
     }
     expect(new Set(MOCK_SERVICES.map((s) => s.id)).size).toBe(MOCK_SERVICES.length);
@@ -54,16 +56,30 @@ describe('catálogo', () => {
 });
 
 describe('usersService (Firebase Auth + Firestore)', () => {
-  it('crea perfil cliente deshabilitado en el primer ingreso', async () => {
+  it('crea perfil USER habilitado en el primer ingreso', async () => {
     fb.getDoc.mockResolvedValue({ exists: () => false });
     const p = await usersService.ensureProfile({ uid: 'u1', email: 'a@x.com' });
-    expect(p).toMatchObject({ uid: 'u1', role: 'cliente', enabled: false });
+    expect(p).toMatchObject({ uid: 'u1', role: 'user', enabled: true });
     expect(fb.setDoc).toHaveBeenCalledOnce();
   });
 
   it('devuelve el perfil existente con su rol', async () => {
     fb.getDoc.mockResolvedValue({ exists: () => true, data: () => ({ role: 'admin', enabled: true }) });
     expect(await usersService.ensureProfile({ uid: 'u2' })).toEqual({ uid: 'u2', role: 'admin', enabled: true });
+  });
+
+  it('un registro previo con rol ADMIN se respeta y se consume', async () => {
+    fb.getDoc.mockResolvedValueOnce({ exists: () => false }).mockResolvedValueOnce({ exists: () => true, data: () => ({ role: 'admin' }) });
+    const p = await usersService.ensureProfile({ uid: 'u9', email: 'Admin@X.com' });
+    expect(p).toMatchObject({ role: 'admin', enabled: true });
+    expect(fb.deleteDoc).toHaveBeenCalledWith({ col: 'usuarios', id: 'admin@x.com' });
+  });
+
+  it('el admin crea y elimina usuarios (CRUD)', async () => {
+    await usersService.create({ email: ' Nuevo@X.com ', role: 'admin' });
+    expect(fb.setDoc).toHaveBeenCalledWith({ col: 'usuarios', id: 'nuevo@x.com' }, expect.objectContaining({ role: 'admin', enabled: true }));
+    await usersService.remove('u1');
+    expect(fb.deleteDoc).toHaveBeenCalledWith({ col: 'usuarios', id: 'u1' });
   });
 
   it('el admin habilita usuarios', async () => {
@@ -121,5 +137,69 @@ describe('sesión simulada', () => {
     expect(getDemoUser(false, true)?.uid).toBe('demo-user-123');
     expect(getDemoUser(false, false)).toBeNull();
     expect(getDemoUser(true, true)).toBeNull();
+  });
+});
+
+describe('errores de Firebase Auth', () => {
+  it('traduce códigos de Firebase Auth a mensajes claros', async () => {
+    const { authErrorMessage } = await import('../../authErrors');
+    expect(authErrorMessage({ code: 'auth/invalid-credential' })).toMatch(/incorrectos/);
+    expect(authErrorMessage({ code: 'auth/unauthorized-domain' })).toMatch(/Authorized domains/);
+    expect(authErrorMessage({ code: 'auth/not-configured' })).toMatch(/VITE_FIREBASE/);
+    expect(authErrorMessage({ message: 'otro' })).toBe('otro');
+  });
+});
+
+describe('secciones opcionales', () => {
+  const data = {
+    locations: { ceremony: { place: 'A' }, reception: { place: 'B' } },
+    itinerary: [{ time: '10:00', title: 'x' }],
+    dressCode: { type: 'Formal' },
+    gallery: [{ url: 'u', caption: 'c' }]
+  };
+
+  it('por defecto todas están desmarcadas y se ocultan', async () => {
+    const { applySections } = await import('../../sections');
+    const v = applySections(data);
+    expect(v.locations).toEqual({});
+    expect(v.itinerary).toEqual([]);
+    expect(v.dressCode).toBeNull();
+    expect(v.gallery).toEqual([]);
+  });
+
+  it('muestra solo las secciones marcadas', async () => {
+    const { applySections } = await import('../../sections');
+    const v = applySections({ ...data, sections: { ceremony: true, gallery: true } });
+    expect(v.locations).toEqual({ ceremony: { place: 'A' } });
+    expect(v.gallery).toHaveLength(1);
+    expect(v.itinerary).toEqual([]);
+  });
+});
+
+describe('guardado de invitación (Firestore)', () => {
+  it('propaga permission-denied para mostrarlo en el editor', async () => {
+    fb.setDoc.mockRejectedValueOnce(Object.assign(new Error('Missing or insufficient permissions.'), { code: 'permission-denied' }));
+    await expect(invitationsService.save({ slug: 'j-m-2024' })).rejects.toMatchObject({ code: 'permission-denied' });
+  });
+
+  it('guarda las secciones y el catálogo elegido en el documento', async () => {
+    await invitationsService.save({ slug: 's1', serviceId: 'x', sections: { gallery: true } });
+    expect(fb.setDoc).toHaveBeenCalledWith({ col: 'invitaciones', id: 's1' }, expect.objectContaining({ serviceId: 'x', sections: { gallery: true } }), { merge: true });
+  });
+});
+
+describe('guardado compatible con las reglas (userId)', () => {
+  it('copia ownerId a userId al guardar', async () => {
+    await invitationsService.save({ slug: 's2', ownerId: 'u7' });
+    expect(fb.setDoc).toHaveBeenCalledWith({ col: 'invitaciones', id: 's2' }, expect.objectContaining({ ownerId: 'u7', userId: 'u7' }), { merge: true });
+  });
+});
+
+describe('filtro por tipo de plantilla', () => {
+  it('cada tipo del filtro tiene plantillas en el catálogo', async () => {
+    const { EVENT_TYPES } = await import('../../sections');
+    for (const t of EVENT_TYPES.filter((e) => e.id !== 'all')) {
+      expect(MOCK_SERVICES.some((s) => s.eventType === t.id)).toBe(true);
+    }
   });
 });
