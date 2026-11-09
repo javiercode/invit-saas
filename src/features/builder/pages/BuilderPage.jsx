@@ -218,6 +218,17 @@ export const BuilderPage = ({ simulator = false }) => {
           </div>
 
           <div className="builder-field">
+            <span className="field-label">Número de confirmación (pases máximos por invitado)</span>
+            <input
+              type="number"
+              min="1"
+              max="20"
+              value={formData.maxPasses ?? 4}
+              onChange={(e) => setFormData({ ...formData, maxPasses: Math.max(1, Number(e.target.value) || 1) })}
+            />
+          </div>
+
+          <div className="builder-field">
             <span className="field-label">Fecha y Hora del Evento</span>
             <input
               type="datetime-local"

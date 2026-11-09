@@ -173,6 +173,7 @@ export const ModernaTemplate = ({ data = {} }) => {
         isOpen={isRsvpOpen}
         onClose={() => setIsRsvpOpen(false)}
         invitationId={id}
+        invitation={data}
         coupleNames={`${couple.bride} y ${couple.groom}`}
         deadlineDate={rsvpDeadline}
       />

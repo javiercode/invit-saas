@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { CheckCircle, XCircle, Send, Heart, X, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, Send, Heart, X, Loader2, CalendarPlus } from 'lucide-react';
 import { invitationsService } from '../../../../core/services/invitationsService';
+import { getCalendarEvent, downloadIcs, googleCalendarUrl } from '../../../../core/calendar';
 import './RsvpModal.css';
 
 export const RsvpModal = ({
   isOpen,
   onClose,
   invitationId,
+  invitation = {},
   coupleNames = "los novios",
   deadlineDate
 }) => {
@@ -22,6 +24,8 @@ export const RsvpModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const maxPasses = Math.max(1, Number(invitation.maxPasses) || 4);
+  const calendarEvent = getCalendarEvent(invitation);
 
   if (!isOpen) return null;
 
@@ -78,6 +82,16 @@ export const RsvpModal = ({
                 ? `Tu asistencia ha sido confirmada con éxito. ¡${coupleNames} están felices de compartir este día contigo!`
                 : `Agradecemos que nos hayas avisado. Te tendremos en el corazón durante este día tan especial.`}
             </p>
+            {formData.attending === 'yes' && !isNaN(calendarEvent.start) && (
+              <>
+                <button className="rsvp-primary-btn" onClick={() => downloadIcs(calendarEvent)}>
+                  <CalendarPlus size={16} /> Agregar al calendario
+                </button>
+                <a className="rsvp-calendar-link" href={googleCalendarUrl(calendarEvent)} target="_blank" rel="noreferrer">
+                  o abrir en Google Calendar
+                </a>
+              </>
+            )}
             <button className="rsvp-primary-btn" onClick={onClose}>
               Cerrar
             </button>
@@ -149,10 +163,9 @@ export const RsvpModal = ({
                     value={formData.companionsCount}
                     onChange={(e) => setFormData({ ...formData, companionsCount: e.target.value })}
                   >
-                    <option value="1">1 Persona</option>
-                    <option value="2">2 Personas</option>
-                    <option value="3">3 Personas</option>
-                    <option value="4">4 Personas</option>
+                    {Array.from({ length: maxPasses }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>{i + 1} {i ? 'Personas' : 'Persona'}</option>
+                    ))}
                   </select>
                 </div>
 

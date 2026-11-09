@@ -203,3 +203,35 @@ describe('filtro por tipo de plantilla', () => {
     }
   });
 });
+
+describe('calendario del dispositivo (.ics)', () => {
+  const inv = {
+    eventDate: '2026-11-28T18:00:00',
+    couple: { bride: 'Ana', groom: 'Luis' },
+    locations: { ceremony: { place: 'Parroquia, Centro', address: 'Calle 1', googleMapsUrl: 'https://maps.google.com/?q=1' } },
+    maxPasses: 3
+  };
+
+  it('genera un evento iCalendar válido con ubicación y recordatorio', async () => {
+    const { getCalendarEvent, buildIcs } = await import('../../calendar');
+    const ics = buildIcs(getCalendarEvent(inv), 'uid-1');
+    expect(ics).toMatch(/^BEGIN:VCALENDAR/);
+    expect(ics).toContain('SUMMARY:Invitación: Ana y Luis');
+    expect(ics).toContain('LOCATION:Parroquia\\, Centro\\, Calle 1');
+    expect(ics).toContain('TRIGGER:-P1D');
+    expect(ics).toMatch(/DTSTART:\d{8}T\d{6}Z/);
+    expect(ics.trim()).toMatch(/END:VCALENDAR$/);
+  });
+
+  it('el evento dura 5 h y el enlace de Google Calendar lo incluye', async () => {
+    const { getCalendarEvent, googleCalendarUrl } = await import('../../calendar');
+    const ev = getCalendarEvent(inv);
+    expect(ev.end - ev.start).toBe(5 * 3600 * 1000);
+    expect(googleCalendarUrl(ev)).toContain('calendar.google.com');
+  });
+
+  it('el número de confirmación (maxPasses) se guarda con la invitación', async () => {
+    await invitationsService.save({ slug: 's3', maxPasses: 3 });
+    expect(fb.setDoc).toHaveBeenCalledWith({ col: 'invitaciones', id: 's3' }, expect.objectContaining({ maxPasses: 3 }), { merge: true });
+  });
+});
