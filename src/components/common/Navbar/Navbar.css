@@ -84,11 +84,17 @@
   color: #b38728;
 }
 
+.navbar-menu { display: flex; align-items: center; flex: 1; justify-content: space-between; margin-left: 1.5rem; }
+.navbar-toggle { display: none; background: none; border: 0; cursor: pointer; color: #1a1a1a; padding: .25rem; }
+
 @media (max-width: 680px) {
-  .navbar-links span {
-    display: none;
+  .navbar-toggle { display: block; }
+  .navbar-menu {
+    display: none; position: absolute; top: 64px; left: 0; right: 0; margin: 0;
+    flex-direction: column; align-items: stretch; gap: 1rem; padding: 1rem 1.5rem;
+    background: #fff; border-bottom: 1px solid #ebd9b8; box-shadow: 0 8px 16px rgba(0,0,0,.08);
   }
-  .navbar-links {
-    gap: 0.75rem;
-  }
+  .navbar-menu.open { display: flex; }
+  .navbar-links { flex-direction: column; gap: .25rem; }
+  .navbar-cta .btn-login { justify-content: center; }
 }

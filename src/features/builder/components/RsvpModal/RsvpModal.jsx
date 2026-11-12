@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { CheckCircle, XCircle, Send, Heart, X, Loader2, CalendarPlus } from 'lucide-react';
 import { invitationsService } from '../../../../core/services/invitationsService';
@@ -24,6 +25,17 @@ export const RsvpModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [searchParams] = useSearchParams();
+  const guestId = searchParams.get('g');
+
+  // Invitado pre-registrado: nombre y teléfono ya vienen cargados desde el link
+  useEffect(() => {
+    if (!guestId) return;
+    invitationsService.getGuest(guestId).then((g) => {
+      if (g) setFormData((f) => ({ ...f, name: g.name || f.name, phone: g.phone || f.phone }));
+    }).catch(() => {});
+  }, [guestId]);
+
   const maxPasses = Math.max(1, Number(invitation.maxPasses) || 4);
   const calendarEvent = getCalendarEvent(invitation);
 
@@ -42,7 +54,7 @@ export const RsvpModal = ({
         companionsCount: Number(formData.companionsCount),
         dietaryRestrictions: formData.dietaryRestrictions,
         message: formData.message
-      });
+      }, guestId);
 
       setSubmitted(true);
       if (formData.attending === 'yes') {
@@ -84,11 +96,11 @@ export const RsvpModal = ({
             </p>
             {formData.attending === 'yes' && !isNaN(calendarEvent.start) && (
               <>
-                <button className="rsvp-primary-btn" onClick={() => downloadIcs(calendarEvent)}>
-                  <CalendarPlus size={16} /> Agregar al calendario
+                <button className="rsvp-primary-btn" onClick={() => googleCalendarUrl(calendarEvent)}>
+                  <CalendarPlus size={16} /> Abrir en Google Calendar
                 </button>
-                <a className="rsvp-calendar-link" href={googleCalendarUrl(calendarEvent)} target="_blank" rel="noreferrer">
-                  o abrir en Google Calendar
+                <a className="rsvp-calendar-link" href={downloadIcs(calendarEvent)} target="_blank" rel="noreferrer">
+                  o en Calendario (Descargar .ics)
                 </a>
               </>
             )}

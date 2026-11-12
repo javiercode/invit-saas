@@ -8,7 +8,8 @@ const fb = vi.hoisted(() => ({
   setDoc: vi.fn(),
   updateDoc: vi.fn(),
   deleteDoc: vi.fn(),
-  signIn: vi.fn()
+  signIn: vi.fn(),
+  addDoc: vi.fn()
 }));
 
 vi.mock('../../firebase', () => ({
@@ -24,7 +25,7 @@ vi.mock('../../firebase', () => ({
   setDoc: fb.setDoc,
   updateDoc: fb.updateDoc,
   deleteDoc: fb.deleteDoc,
-  addDoc: vi.fn(),
+  addDoc: fb.addDoc,
   serverTimestamp: vi.fn(),
   arrayUnion: vi.fn()
 }));
@@ -233,5 +234,40 @@ describe('calendario del dispositivo (.ics)', () => {
   it('el número de confirmación (maxPasses) se guarda con la invitación', async () => {
     await invitationsService.save({ slug: 's3', maxPasses: 3 });
     expect(fb.setDoc).toHaveBeenCalledWith({ col: 'invitaciones', id: 's3' }, expect.objectContaining({ maxPasses: 3 }), { merge: true });
+  });
+});
+
+describe('confirmaciones RSVP con invitado pre-registrado (Firestore)', () => {
+  it('addGuest crea un invitado pendiente con nombre y teléfono', async () => {
+    const addDoc = fb.addDoc;
+    addDoc.mockResolvedValue({ id: 'g1' });
+    const g = await invitationsService.addGuest('inv1', { name: ' Ana ', phone: '70000000' });
+    expect(addDoc).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ name: 'Ana', phone: '70000000', status: 'pending', invitationId: 'inv1' }));
+    expect(g.id).toBe('g1');
+  });
+
+  it('getGuest devuelve los datos para prellenar el formulario', async () => {
+    fb.getDoc.mockResolvedValue({ exists: () => true, id: 'g1', data: () => ({ name: 'Ana', phone: '7' }) });
+    expect(await invitationsService.getGuest('g1')).toEqual({ id: 'g1', name: 'Ana', phone: '7' });
+  });
+
+  it('submitRsvp con guestId actualiza el documento existente', async () => {
+    await invitationsService.submitRsvp('inv1', { name: 'Ana', attending: true }, 'g1');
+    expect(fb.setDoc).toHaveBeenCalledWith({ col: 'rsvp', id: 'g1' }, expect.objectContaining({ status: 'responded' }), { merge: true });
+  });
+
+  it('listRsvps consulta por invitationId', async () => {
+    fb.getDocs.mockResolvedValue({ docs: [{ id: 'g1', data: () => ({ name: 'Ana' }) }] });
+    expect(await invitationsService.listRsvps('inv1')).toEqual([{ id: 'g1', name: 'Ana' }]);
+  });
+});
+
+describe('link de WhatsApp para invitados', () => {
+  it('incluye teléfono y link con el id del invitado', async () => {
+    vi.stubGlobal('window', { location: { origin: 'https://x.github.io' } });
+    const { whatsappUrl } = await import('../../../features/dashboard/components/GuestListModal');
+    const url = whatsappUrl({ id: 'g1', name: 'Ana', phone: '+591 7000-0000' }, 'boda');
+    expect(url).toMatch(/^https:\/\/wa\.me\/59170000000\?text=/);
+    expect(decodeURIComponent(url)).toContain('invitacion/boda?g=g1');
   });
 });

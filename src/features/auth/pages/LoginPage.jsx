@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../../core/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { authErrorMessage } from '../../../core/authErrors';
-import { LogIn, Sparkles } from 'lucide-react';
+import { LogIn, Sparkles, MessageCircle, Send, X } from 'lucide-react';
 import './LoginPage.css';
 
 export const LoginPage = () => {
-  const { loginWithGoogle, loginWithEmail } = useAuth();
+  const { loginWithEmail } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+
+  const dialogRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [requestText, setRequestText] = useState(
+    'Hola, solicito acceso a la plataforma para administrar mis eventos con tarjetas virtuales.'
+  );
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (isModalOpen) {
+      if (!dialog.open) dialog.showModal();
+    } else if (dialog.open) {
+      dialog.close();
+    }
+  }, [isModalOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,13 +40,12 @@ export const LoginPage = () => {
     }
   };
 
-  const handleGoogle = async () => {
-    try {
-      await loginWithGoogle();
-      navigate('/dashboard');
-    } catch (err) {
-      setError(authErrorMessage(err));
-    }
+  const handleSendRequest = (e) => {
+    e.preventDefault();
+    const phoneNumber = '+59162544875';
+    const whatsappUrl = `https://wa.me/+59162544875/?text=${encodeURIComponent(requestText)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    setIsModalOpen(false);
   };
 
   return (
@@ -46,26 +62,13 @@ export const LoginPage = () => {
 
         {error && <div className="login-error-banner">{error}</div>}
 
-        <button type="button" className="btn-google" onClick={handleGoogle}>
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-            />
-          </svg>
-          <span>Continuar con Google</span>
+        <button
+          type="button"
+          className="btn-google"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <MessageCircle size={18} />
+          <span>Solicitar acceso al +591 62544875</span>
         </button>
 
         <div className="login-separator">
@@ -101,6 +104,65 @@ export const LoginPage = () => {
           </button>
         </form>
       </div>
+
+      <dialog
+        ref={dialogRef}
+        onClose={() => setIsModalOpen(false)}
+        onClick={(e) => {
+          if (e.target === dialogRef.current) setIsModalOpen(false);
+        }}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          margin: 'auto',
+          border: 'none',
+          padding: '1rem',
+          background: 'transparent',
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          overflow: 'visible'
+        }}
+      >
+        <div className="login-card">
+          <div className="login-header">
+            <span className="login-badge">
+              <MessageCircle size={14} />
+              <span>Contacto Directo</span>
+            </span>
+            <h2>Solicitar Acceso</h2>
+            <p>
+              Escribe tu mensaje para enviarlo al <strong>+591 62544875</strong> y habilitar tu cuenta para administrar eventos por tarjetas virtuales.
+            </p>
+          </div>
+
+          <form onSubmit={handleSendRequest} className="login-form">
+            <div className="form-field">
+              <label>Tu Mensaje</label>
+              <textarea
+                rows={4}
+                required
+                value={requestText}
+                onChange={(e) => setRequestText(e.target.value)}
+                placeholder="Escribe tus datos o detalles de tu evento..."
+              />
+            </div>
+
+            <button type="submit" className="btn-submit-auth">
+              <Send size={18} />
+              <span>Enviar Solicitud</span>
+            </button>
+
+            <button
+              type="button"
+              className="btn-google"
+              onClick={() => setIsModalOpen(false)}
+            >
+              <X size={18} />
+              <span>Cancelar</span>
+            </button>
+          </form>
+        </div>
+      </dialog>
     </div>
   );
 };

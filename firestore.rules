@@ -17,7 +17,10 @@ service cloud.firestore {
 
     match /confirmaciones_rsvp/{rsvpId} {
       allow create: if true;
-      allow read, update, delete: if signedIn();
+      allow get: if true; // el invitado abre su link con el id del documento
+      allow list, delete: if signedIn();
+      // el invitado completa su registro una sola vez; el anfitrión edita siempre
+      allow update: if signedIn() || resource.data.status == 'pending';
     }
 
     match /servicios/{servicioId} {

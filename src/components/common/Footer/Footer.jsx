@@ -41,6 +41,11 @@ export const Footer = () => {
           Hecho con <Heart size={14} className="heart-inline" /> para celebrar tus mejores momentos.
           Compatible con GitHub Pages y Firebase.
         </p>
+        <p>
+          Diseñado por <a href="https://tekforge.ia.bo/" target="_blank" rel="noreferrer">TekForge</a>
+          {' · '}Contacto directo:{' '}
+          <a href="https://wa.me/59162544875" target="_blank" rel="noreferrer">+591 62544875</a> (Administrador)
+        </p>
       </div>
     </footer>
   );

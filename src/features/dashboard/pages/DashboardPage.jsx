@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Calendar, ExternalLink, Edit3, Share2, Sparkles, Check } from 'lucide-react';
+import { Users, Calendar, ExternalLink, Edit3, Share2, Sparkles, Check, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../../core/contexts/AuthContext';
 import { invitationsService } from '../../../core/services/invitationsService';
 import { getTemplateById } from '../../../templates';
+import GuestListModal from '../components/GuestListModal';
 import './DashboardPage.css';
 
 export const DashboardPage = () => {
   const [copiedId, setCopiedId] = useState(null);
+  const [guestsFor, setGuestsFor] = useState(null);
 
   const { profile } = useAuth();
   const [all, setAll] = useState([]);
@@ -105,6 +107,10 @@ export const DashboardPage = () => {
                   <Edit3 size={16} />
                   <span>Editar</span>
                 </Link>
+                <button type="button" className="btn-action btn-edit" onClick={() => setGuestsFor(inv)}>
+                  <ClipboardList size={16} />
+                  <span>Confirmaciones</span>
+                </button>
                 <button
                   type="button"
                   className="btn-action btn-share"
@@ -127,6 +133,7 @@ export const DashboardPage = () => {
           ))}
         </div>
       </section>
+      {guestsFor && <GuestListModal invitation={guestsFor} onClose={() => setGuestsFor(null)} />}
     </div>
   );
 };

@@ -16,6 +16,7 @@ import {
 import { MOCK_INVITATIONS, MOCK_SERVICES } from './mockData';
 
 // Copia mutable para el modo sin Firebase
+const mockRsvps = [];
 const mockStore = Object.values(MOCK_INVITATIONS).map((i) => ({ ...i }));
 
 /**
@@ -95,15 +96,21 @@ export const invitationsService = {
   /**
    * Registra una confirmación de asistencia (RSVP) en la subcolección o colección de Firestore
    */
-  async submitRsvp(invitationId, rsvpData) {
+  async submitRsvp(invitationId, rsvpData, guestId = null) {
     const payload = {
       ...rsvpData,
       invitationId,
+      status: 'responded',
       createdAt: new Date().toISOString()
     };
 
     if (isFirebaseConfigured) {
       try {
+        // Invitado pre-registrado: se completa su documento en lugar de crear uno nuevo
+        if (guestId) {
+          await setDoc(doc(db, COLLECTIONS.RSVPS, guestId), payload, { merge: true });
+          return { success: true, id: guestId };
+        }
         const docRef = await addDoc(collection(db, COLLECTIONS.RSVPS), {
           ...payload,
           serverTimestamp: serverTimestamp()
@@ -118,6 +125,36 @@ export const invitationsService = {
     // Guardado simulado para entorno demo/local
     console.log('[MOCK RSVP SUBMISSION]', payload);
     return { success: true, id: `mock-${Date.now()}` };
+  },
+
+  /** Lista las confirmaciones (y invitados pendientes) de una invitación. */
+  async listRsvps(invitationId) {
+    if (!isFirebaseConfigured) return mockRsvps.filter((r) => r.invitationId === invitationId);
+    const q = query(collection(db, COLLECTIONS.RSVPS), where('invitationId', '==', invitationId));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  },
+
+  /** Pre-registra un invitado (nombre y teléfono); queda pendiente de respuesta. */
+  async addGuest(invitationId, { name, phone = '' }) {
+    const guest = { invitationId, name: name.trim(), phone: phone.trim(), status: 'pending', createdAt: new Date().toISOString() };
+    if (isFirebaseConfigured) {
+      const ref = await addDoc(collection(db, COLLECTIONS.RSVPS), guest);
+      return { id: ref.id, ...guest };
+    }
+    const mock = { id: `mock-${Date.now()}`, ...guest };
+    mockRsvps.push(mock);
+    return mock;
+  },
+
+  /** Obtiene un invitado pre-registrado (para prellenar el formulario del RSVP). */
+  async getGuest(guestId) {
+    if (!guestId) return null;
+    if (isFirebaseConfigured) {
+      const snap = await getDoc(doc(db, COLLECTIONS.RSVPS, guestId));
+      return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    }
+    return mockRsvps.find((r) => r.id === guestId) || null;
   },
 
   /**

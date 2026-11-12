@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FlaskConical, Sparkles, LayoutDashboard, Compass, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import { FlaskConical, Sparkles, LayoutDashboard, Compass, LogIn, LogOut, ShieldCheck, Menu, X } from 'lucide-react';
 import { useAuth } from '../../../core/contexts/AuthContext';
 import './Navbar.css';
 
 export const Navbar = () => {
   const location = useLocation();
   const { user, isAdmin, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  // Cierra el menú móvil al navegar
+  useEffect(() => { setOpen(false); }, [location.pathname]);
 
   // Ocultar Navbar estándar si estamos viendo una invitación en vivo (/invitacion/:slug)
   if (location.pathname.startsWith('/invitacion/')) {
@@ -23,6 +27,11 @@ export const Navbar = () => {
           </span>
         </Link>
 
+        <button type="button" className="navbar-toggle" aria-label="Menú" aria-expanded={open} onClick={() => setOpen(!open)}>
+          {open ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <div className={`navbar-menu ${open ? 'open' : ''}`}>
         <div className="navbar-links">
           <Link
             to="/catalogo"
@@ -70,6 +79,7 @@ export const Navbar = () => {
               <span>Iniciar Sesión</span>
             </Link>
           )}
+        </div>
         </div>
       </div>
     </nav>
