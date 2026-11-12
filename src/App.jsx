@@ -19,7 +19,7 @@ import './App.css';
 export function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <div className="app-container">
           <Navbar />
           <div className="app-main-content">
